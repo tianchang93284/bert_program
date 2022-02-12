@@ -58,7 +58,7 @@ def train(config, model,model_name, train_iter, dev_iter, test_iter):
             loss = nn.BCELoss()(outputs, labels.float())
             loss.backward()
             optimizer.step()
-            if total_batch % 100 == 0:
+            if total_batch % 10 == 0:
                 # 每多少轮输出在训练集和验证集上的效果
                 true = labels.data.cpu()
                 #print(true.float())
@@ -86,7 +86,7 @@ def train(config, model,model_name, train_iter, dev_iter, test_iter):
                 break
         if flag:
             break
-    test(config, model, model_name, train_time_dif, test_iter)
+    #test(config, model, model_name, train_time_dif, test_iter)
 
 
 def test(config, model, model_name, train_time_dif, test_iter):
