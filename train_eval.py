@@ -44,6 +44,13 @@ def train(config, model,model_name, train_iter, dev_iter, test_iter):
                          lr=config.learning_rate,
                          warmup=0.05,
                          t_total=len(train_iter) * config.num_epochs)
+
+    try:
+        from apex import amp
+    except ImportError:
+        raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
+    model, optimizer = amp.initialize(model, optimizer, '01')
+
     total_batch = 0  # 记录进行到多少batch
     dev_best_loss = float('inf')
     last_improve = 0  # 记录上次验证集loss下降的batch数
