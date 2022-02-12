@@ -86,7 +86,7 @@ def train(config, model,model_name, train_iter, dev_iter, test_iter):
                 break
         if flag:
             break
-    #test(config, model, model_name, train_time_dif, test_iter)
+    test(config, model, model_name, train_time_dif, test_iter)
 
 
 def test(config, model, model_name, train_time_dif, test_iter):
