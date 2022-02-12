@@ -118,12 +118,12 @@ def evaluate(config, model, data_iter, test=False):
     labels_all = []
     with torch.no_grad():
         for texts, labels in data_iter:
-            print('!!!This is texts:\n!!!',texts)
-            print('!!!This is texts shape:\n!!!',texts[0].shape)
+            #print('!!!This is texts:\n!!!',texts)
+            #print('!!!This is texts shape:\n!!!',texts[0].shape)
             outputs = model(texts)
-            print('!!!This is origin output:\n!!!',outputs)
+            #print('!!!This is origin output:\n!!!',outputs)
             outputs = torch.sigmoid(outputs)
-            print('!!!This is sigmoid output:\n!!!',outputs)
+            #print('!!!This is sigmoid output:\n!!!',outputs)
             loss = nn.BCELoss()(outputs, labels.float())
             loss_total += loss
             labels = labels.data.cpu().numpy()
