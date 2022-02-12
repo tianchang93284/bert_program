@@ -20,7 +20,7 @@ class Config(object):
         self.require_improvement = 1000                                 # 若超过1000batch效果还没提升，则提前结束训练
         self.num_classes = len(self.class_list)                         # 类别数
         self.num_epochs = 30                                             # epoch数
-        self.batch_size = 200                                            # mini-batch大小
+        self.batch_size = 16                                            # mini-batch大小
         self.pad_size = 20                                              # 每句话处理成的长度(短填长切)
         self.learning_rate = 3e-5                                       # 学习率
         self.threshold = 0.5                                            # 概率阈值
