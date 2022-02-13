@@ -52,6 +52,7 @@ class Model(nn.Module):
         self.u_omega = nn.Parameter(torch.Tensor(config.hidden_size, config.hidden_size))
         nn.init.uniform_(self.w_omega, -0.1, 0.1)
         nn.init.uniform_(self.u_omega, -0.1, 0.1)
+        self.output_lstm_label = self.label_lstm_out()
 
     def attention_net(self, x):  # x:[batch, seq_len, hidden_dim*2]
         u = torch.tanh(torch.matmul(x, self.w_omega))  # [batch, seq_len, hidden_dim*2]
