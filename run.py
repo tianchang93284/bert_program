@@ -22,7 +22,7 @@ if __name__ == '__main__':
     torch.manual_seed(1)
     torch.cuda.manual_seed_all(1)
     torch.backends.cudnn.deterministic = True  # 保证每次结果一样
-
+    torch.backends.cudnn.benchmark = True #增加计算速度
     start_time = time.time()
     print("Loading data...")
     train_data, dev_data, test_data = build_dataset(config)
