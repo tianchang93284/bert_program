@@ -64,6 +64,7 @@ def train(config, model,model_name, train_iter, dev_iter, test_iter):
                 outputs = torch.sigmoid(outputs)
                 model.zero_grad()
                 loss = nn.BCELoss()(outputs, labels.float())
+                loss.requires_grad_(True)
                 loss.backward()
                 optimizer.step()
                 if total_batch % 10 == 0:
