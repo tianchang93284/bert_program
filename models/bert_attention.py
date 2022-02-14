@@ -79,7 +79,7 @@ class Model(nn.Module):
                            "创造和知识产权保护", "项目计划", "财政支持", "技术研发"
                            ]
         self.label_ids = []
-        for item in self.label_list:
+        for item in label_list:
             item = ['CLS'] + list(item) + ['CLS']
             ids = config.tokenizer.convert_tokens_to_ids(item)
             self.label_ids.append(ids)
