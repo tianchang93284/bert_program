@@ -80,7 +80,7 @@ class Model(nn.Module):
                            ]
         self.label_ids = []
         for item in label_list:
-            item = ['CLS'] + list(item) + ['CLS']
+            item = list(item)
             ids = config.tokenizer.convert_tokens_to_ids(item)
             self.label_ids.append(ids)
     def attention_net(self, x):  # x:[batch, seq_len, hidden_dim*2]
