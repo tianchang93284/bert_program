@@ -2,8 +2,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from pytorch_pretrained import BertModel, BertTokenizer
-
+from pytorch_pretrained import BertModel, BertTokenizer, tokenization
+import math
 
 class Config(object):
 
@@ -70,10 +70,19 @@ class Model(nn.Module):
         self.u_omega = nn.Parameter(torch.Tensor(config.hidden_size, config.hidden_size))
         nn.init.uniform_(self.w_omega, -0.1, 0.1)
         nn.init.uniform_(self.u_omega, -0.1, 0.1)
-        self.output_lstm_label = self.label_lstm_out()
-        self.label_word = LabelLstmOutPut()
-        self.config = Config
 
+        self.label_embedding = nn.Embedding(50, 256)
+        self.label_lstm = nn.LSTM(256, 768, num_layers=1, bidirectional=False)
+        # hidden_param = nn.Parameter(torch.Tensor(768, 768))
+        label_list = ["政府采购", "科技基础设施建设", "市场监管", "公共服务", "科技成果转移转化",
+                           "科创基地与平台", "金融支持", "教育和科普", "人才队伍", "贸易协定", "税收激励",
+                           "创造和知识产权保护", "项目计划", "财政支持", "技术研发"
+                           ]
+        self.label_ids = []
+        for item in self.label_list:
+            item = ['CLS'] + list(item) + ['CLS']
+            ids = config.tokenizer.convert_tokens_to_ids(item)
+            self.label_ids.append(ids)
     def attention_net(self, x):  # x:[batch, seq_len, hidden_dim*2]
         u = torch.tanh(torch.matmul(x, self.w_omega))  # [batch, seq_len, hidden_dim*2]
         att = torch.matmul(u, self.u_omega)  # [batch, seq_len, 1]
@@ -92,29 +101,35 @@ class Model(nn.Module):
         return context, p_attn
 
     def label_lstm_out(self):
-        label_list = ["政府采购", "科技基础设施建设", "市场监管", "公共服务", "科技成果转移转化",
-                      "科创基地与平台", "金融支持", "教育和科普", "人才队伍", "贸易协定", "税收激励",
-                      "创造和知识产权保护", "项目计划", "财政支持", "技术研发"
-                      ]
-
-        embedding = nn.Embedding(50, 256)
-        lstm = nn.LSTM(256, 768, num_layers=1, bidirectional=False)
-        #hidden_param = nn.Parameter(torch.Tensor(768, 768))
-        output_lstm_label = []
-        for item in label_list:
-            item = ['CLS'] + list(item) + ['CLS']
-            ids = self.config.tokenizer.convert_tokens_to_ids(item)
-            output, (lstmhidden, c_out) = lstm(embedding(ids))
-            output_lstm_label.append(lstmhidden)
-        return output_lstm_label
+        # label_list = ["政府采购", "科技基础设施建设", "市场监管", "公共服务", "科技成果转移转化",
+        #               "科创基地与平台", "金融支持", "教育和科普", "人才队伍", "贸易协定", "税收激励",
+        #               "创造和知识产权保护", "项目计划", "财政支持", "技术研发"
+        #               ]
+        #
+        # embedding = nn.Embedding(50, 256)
+        # lstm = nn.LSTM(256, 768, num_layers=1, bidirectional=False)
+        # #hidden_param = nn.Parameter(torch.Tensor(768, 768))
+        # output_lstm_label = []
+        # for item in label_list:
+        #     item = ['CLS'] + list(item) + ['CLS']
+        #     ids = self.config.tokenizer.convert_tokens_to_ids(item)
+        #     output, (lstmhidden, c_out) = lstm(embedding(ids))
+        #     output_lstm_label.append(lstmhidden)
+        # return output_lstm_label
+        pass
 
     def forward(self, x):
         context = x[0]  # 输入的句子
         mask = x[2]  # 对padding部分进行mask，和句子一个size，padding部分用0表示，如：[1, 1, 1, 1, 0, 0]
         encoder_out, text_cls = self.bert(context, attention_mask=mask, output_all_encoded_layers=False)
 
+        output_lstm_label = []
+        for item in self.label_ids:
+            output, (lstmhidden, c_out) = self.label_lstm(self.label_embedding(item))
+            output_lstm_label.append(lstmhidden)
+
         temp_text_cls = text_cls.clone()
-        for i, label_hidden in enumerate(self.output_lstm_label):
+        for i, label_hidden in enumerate(output_lstm_label):
             if i == 0:
                 text_cls = torch.cat((text_cls, label_hidden))
             else:
