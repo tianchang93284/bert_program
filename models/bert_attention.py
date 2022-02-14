@@ -71,8 +71,8 @@ class Model(nn.Module):
         nn.init.uniform_(self.w_omega, -0.1, 0.1)
         nn.init.uniform_(self.u_omega, -0.1, 0.1)
 
-        self.label_embedding = nn.Embedding(50, 256)
-        self.label_lstm = nn.LSTM(256, 768, num_layers=1, bidirectional=False)
+        self.label_embedding = nn.Embedding(config.hidden_size, config.hidden_size)
+        self.label_lstm = nn.LSTM(config.hidden_size, config.hidden_size, num_layers=1, bidirectional=False)
         # hidden_param = nn.Parameter(torch.Tensor(768, 768))
         label_list = ["政府采购", "科技基础设施建设", "市场监管", "公共服务", "科技成果转移转化",
                            "科创基地与平台", "金融支持", "教育和科普", "人才队伍", "贸易协定", "税收激励",
