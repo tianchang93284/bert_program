@@ -82,7 +82,7 @@ class Model(nn.Module):
         for item in label_list:
             item = list(item)
             ids = config.tokenizer.convert_tokens_to_ids(item)
-            self.label_ids.append(torch.tensor(ids, dtype=torch.long))
+            self.label_ids.append(torch.tensor(ids, dtype=torch.long).to(config.device))
     def attention_net(self, x):  # x:[batch, seq_len, hidden_dim*2]
         u = torch.tanh(torch.matmul(x, self.w_omega))  # [batch, seq_len, hidden_dim*2]
         att = torch.matmul(u, self.u_omega)  # [batch, seq_len, 1]
