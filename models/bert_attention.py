@@ -52,7 +52,12 @@ class LabelLstmOutPut():
                 self.n_words += 1
             else:
                 self.index2word[self.n_words] += 1
-
+    def get_labelids(self, label):
+        ids = []
+        for word in label:
+            ids.append(self.word2index[word])
+        ids = [0] + ids + [1]
+        return ids
 
 class Model(nn.Module):
 
@@ -71,17 +76,20 @@ class Model(nn.Module):
         nn.init.uniform_(self.w_omega, -0.1, 0.1)
         nn.init.uniform_(self.u_omega, -0.1, 0.1)
 
-        self.label_embedding = nn.Embedding(config.vocab_size, config.hidden_size)
-        self.label_lstm = nn.LSTM(config.hidden_size, config.hidden_size, num_layers=1, bidirectional=False)
         # hidden_param = nn.Parameter(torch.Tensor(768, 768))
         label_list = ["政府采购", "科技基础设施建设", "市场监管", "公共服务", "科技成果转移转化",
                            "科创基地与平台", "金融支持", "教育和科普", "人才队伍", "贸易协定", "税收激励",
                            "创造和知识产权保护", "项目计划", "财政支持", "技术研发"
                            ]
+        self.label_tokenize = LabelLstmOutPut()
         self.label_ids = []
         for item in label_list:
-            item = list(item)
-            ids = config.tokenizer.convert_tokens_to_ids(item)
+            self.label_tokenize.addLabel(item)
+
+        self.label_embedding = nn.Embedding(self.label_tokenize.n_words, 256)
+        self.label_lstm = nn.LSTM(256, config.hidden_size, num_layers=1, bidirectional=False)
+        for item in label_list:
+            ids = self.label_tokenize.get_labelids(item)
             self.label_ids.append(torch.tensor(ids, dtype=torch.long).to(config.device))
     def attention_net(self, x):  # x:[batch, seq_len, hidden_dim*2]
         u = torch.tanh(torch.matmul(x, self.w_omega))  # [batch, seq_len, hidden_dim*2]

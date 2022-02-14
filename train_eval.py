@@ -63,6 +63,7 @@ def train(config, model,model_name, train_iter, dev_iter, test_iter):
             model.zero_grad()
             outputs = model(trains)
             outputs = torch.sigmoid(outputs)
+            #outputs.view(-1)
             loss = nn.BCELoss()(outputs, labels.float())
             loss.requires_grad_(True)
             loss.backward()
