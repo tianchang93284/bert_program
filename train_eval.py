@@ -60,9 +60,9 @@ def train(config, model,model_name, train_iter, dev_iter, test_iter):
     for epoch in range(config.num_epochs):
         print('Epoch [{}/{}]'.format(epoch + 1, config.num_epochs))
         for i, (trains, labels) in enumerate(train_iter):
+            model.zero_grad()
             outputs = model(trains)
             outputs = torch.sigmoid(outputs)
-            model.zero_grad()
             loss = nn.BCELoss()(outputs, labels.float())
             loss.requires_grad_(True)
             loss.backward()

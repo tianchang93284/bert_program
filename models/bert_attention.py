@@ -36,6 +36,24 @@ class Config(object):
         self.num_layers = 2
         self.threshold = 0.5
 
+class LabelLstmOutPut():
+    def __init__(self):
+        self.word2index = {}
+        self.word2count = {}
+        self.index2word = {0: "SOS", 1: "EOS"}
+        self.n_words = 2
+
+    def addLabel(self, label):
+        for word in label:
+            if word not in self.word2index:
+                self.word2index[word] = self.n_words
+                self.word2count[word] = 1
+                self.index2word[self.n_words] = word
+                self.n_words += 1
+            else:
+                self.index2word[self.n_words] += 1
+
+
 class Model(nn.Module):
 
     def __init__(self, config):
@@ -53,6 +71,7 @@ class Model(nn.Module):
         nn.init.uniform_(self.w_omega, -0.1, 0.1)
         nn.init.uniform_(self.u_omega, -0.1, 0.1)
         self.output_lstm_label = self.label_lstm_out()
+        self.label_word = LabelLstmOutPut()
 
     def attention_net(self, x):  # x:[batch, seq_len, hidden_dim*2]
         u = torch.tanh(torch.matmul(x, self.w_omega))  # [batch, seq_len, hidden_dim*2]
@@ -77,11 +96,12 @@ class Model(nn.Module):
                       "创造和知识产权保护", "项目计划", "财政支持", "技术研发"
                       ]
 
-        embedding = nn.Embedding(50, 256)
-        lstm = nn.LSTM(256, 768, num_layers=1, bidirectional=False)
+        #embedding = nn.Embedding(50, 256)
+        lstm = nn.LSTM(768, 768, num_layers=1, bidirectional=False)
+        #hidden_param = nn.Parameter(torch.Tensor(768, 768))
         output_lstm_label = []
         for item in label_list:
-            output, (lstmhidden, c_out) = lstm(embedding(item))
+            output, (lstmhidden, c_out) = lstm(self.bert.embeddings(item))
             output_lstm_label.append(lstmhidden)
         return output_lstm_label
 
