@@ -102,7 +102,7 @@ class Model(nn.Module):
         #hidden_param = nn.Parameter(torch.Tensor(768, 768))
         output_lstm_label = []
         for item in label_list:
-            item = ['CLS'] + item + ['CLS']
+            item = ['CLS'] + list(item) + ['CLS']
             ids = self.config.tokenizer.convert_tokens_to_ids(item)
             output, (lstmhidden, c_out) = lstm(embedding(ids))
             output_lstm_label.append(lstmhidden)
