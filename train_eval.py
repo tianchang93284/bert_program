@@ -136,6 +136,7 @@ def evaluate(config, model, data_iter, test=False):
             if len(outputs.shape) > 1:
                 outputs = outputs.squeeze()
             #print('!!!This is sigmoid output:\n!!!',outputs)
+            print(outputs.shape)
             loss = nn.BCELoss()(outputs, labels.float())
             loss_total += loss
             labels = labels.data.cpu().numpy()
