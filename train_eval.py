@@ -133,8 +133,8 @@ def evaluate(config, model, data_iter, test=False):
             outputs = model(texts)
             #print('!!!This is origin output:\n!!!',outputs)
             outputs = torch.sigmoid(outputs)
-            if len(labels.shape) > 1:
-                labels = labels.squeeze()
+            if len(labels.shape) != len(outputs.shape):
+                continue
             #print('!!!This is sigmoid output:\n!!!',outputs)
             # print(outputs.shape)
             # print(labels.shape)
