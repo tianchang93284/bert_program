@@ -133,11 +133,11 @@ def evaluate(config, model, data_iter, test=False):
             outputs = model(texts)
             #print('!!!This is origin output:\n!!!',outputs)
             outputs = torch.sigmoid(outputs)
-            if len(outputs.shape) > 1:
-                outputs = outputs.squeeze()
+            if len(labels.shape) > 1:
+                labels = labels.squeeze()
             #print('!!!This is sigmoid output:\n!!!',outputs)
-            print(outputs.shape)
-            print(labels.shape)
+            # print(outputs.shape)
+            # print(labels.shape)
             loss = nn.BCELoss()(outputs, labels.float())
             loss_total += loss
             labels = labels.data.cpu().numpy()
