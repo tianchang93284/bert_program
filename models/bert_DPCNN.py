@@ -66,6 +66,7 @@ class Model(nn.Module):
             x = self._block(x)
         x = x.squeeze()  # [batch_size, num_filters(250)]
         x = self.fc(x)
+        x = x.squeeze()
         return x
 
     def _block(self, x):
