@@ -64,6 +64,8 @@ def train(config, model,model_name, train_iter, dev_iter, test_iter):
             outputs = model(trains)
             outputs = torch.sigmoid(outputs)
             #outputs.view(-1)
+            if labels.shape != outputs.shape:
+                continue
             loss = nn.BCELoss()(outputs, labels.float())
             loss.requires_grad_(True)
             loss.backward()
