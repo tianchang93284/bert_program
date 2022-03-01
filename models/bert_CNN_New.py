@@ -41,28 +41,15 @@ class Model(nn.Module):
         self.bert = BertModel.from_pretrained(config.bert_path)
         for param in self.bert.parameters():
             param.requires_grad = True
+        self.convs = nn.ModuleList(
+            [nn.Conv2d(1, config.num_filters, (k, config.hidden_size)) for k in config.filter_sizes])
+        self.dropout = nn.Dropout(config.dropout)
 
-        self.conv1 = nn.Conv2d(1, 256, (1, 768))
-        self.conv1_1 = nn.Conv2d(256, 256, (1, 768))
-        self.conv2 = nn.Conv2d(1, 256, (3, 768), padding=(1,1))
-        self.conv3 = nn.Conv2d(256, 256, (5, 768), padding=(2, 2))
-        self.relu = nn.ReLU()
-        self.bn = nn.BatchNorm2d(256)
-        self.fc = nn.Linear(config.num_filters * 4, config.num_classes)
-        #self.maxpool = nn.MaxPool2d()
-        #self.convs = nn.ModuleList(
-            #[nn.Conv2d(1, config.num_filters, (k, config.hidden_size)) for k in config.filter_sizes])
-        #self.dropout = nn.Dropout(config.dropout)
-
-        #self.fc_cnn = nn.Linear(config.num_filters * len(config.filter_sizes), config.num_classes)
+        self.fc_cnn = nn.Linear(config.num_filters * len(config.filter_sizes), config.num_classes)
 
     def conv_and_pool(self, x, conv):
         x = F.relu(conv(x)).squeeze(3)
         x = F.max_pool1d(x, x.size(2)).squeeze(2)
-        return x
-
-    def max_pool(self, x):
-        x = F.max_pool1d(x, x.size(2)).squeeze(3).squeeze(2)
         return x
 
     def forward(self, x):
@@ -70,25 +57,7 @@ class Model(nn.Module):
         mask = x[2]  # 对padding部分进行mask，和句子一个size，padding部分用0表示，如：[1, 1, 1, 1, 0, 0]
         encoder_out, text_cls = self.bert(context, attention_mask=mask, output_all_encoded_layers=False)
         out = encoder_out.unsqueeze(1)
-        out_1 = self.conv1(out)
-        out_2 = self.conv1(out)
-        out_3 = self.conv2(out)
-        out_4 = self.conv2(out)
-
-        out_2 = self.bn(out_2)
-        out_2 = self.relu(out_2)
-        out_2 = self.conv1_1(out_2)
-
-        out_3 = self.bn(out_3)
-        out_3 = self.relu(out_3)
-        out_3 = self.conv3(out_3)
-
-        out = torch.cat([self.max_pool(out_1), self.max_pool(out_2), self.max_pool(out_3), self.max_pool(out_4)], 1)
-        out = self.fc(out)
-        #out = self.bn(out)
-        #out = self.relu(out)
-
-        # out = torch.cat([self.conv_and_pool(out, conv) for conv in self.convs], 1)
-        # out = self.dropout(out)
-        # out = self.fc_cnn(out)
+        out = torch.cat([self.conv_and_pool(out, conv) for conv in self.convs], 1)
+        out = self.dropout(out)
+        out = self.fc_cnn(out)
         return out
