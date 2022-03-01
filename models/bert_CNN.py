@@ -84,7 +84,7 @@ class Model(nn.Module):
         out_3 = self.relu(out_3)
         out_3 = self.conv3(out_3)
 
-        out = torch.cat([self.max_pool(out_1), self.max_pool(out_2), self.max_pool(out_3), self.max_pool(out_4)], 1).squeeze(0)
+        out = torch.cat([self.max_pool(out_1), self.max_pool(out_2), self.max_pool(out_3), self.max_pool(out_4)], 1)
         out = self.fc(out)
         #out = self.bn(out)
         #out = self.relu(out)
