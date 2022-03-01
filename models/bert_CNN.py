@@ -62,7 +62,8 @@ class Model(nn.Module):
         return x
 
     def max_pool(self, x):
-        x = F.max_pool1d(x, x.size(2)).squeeze(3).squeeze(2)
+        x = x.squeeze(3)
+        x = F.max_pool1d(x, x.size(2)).squeeze(2)
         return x
 
     def forward(self, x):
@@ -83,7 +84,7 @@ class Model(nn.Module):
         out_3 = self.relu(out_3)
         out_3 = self.conv3(out_3)
 
-        out = torch.cat([self.max_pool(out_1), self.max_pool(out_2), self.max_pool(out_3), self.max_pool(out_4)], 1)
+        out = torch.cat([self.max_pool(out_1), self.max_pool(out_2), self.max_pool(out_3), self.max_pool(out_4)], 1).squeeze(0)
         out = self.fc(out)
         #out = self.bn(out)
         #out = self.relu(out)
