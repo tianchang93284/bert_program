@@ -43,9 +43,9 @@ class Model(nn.Module):
             param.requires_grad = True
 
         self.conv1 = nn.Conv2d(1, 256, (1, 768))
-        self.conv1_1 = nn.Conv2d(256, 256, (1, 768))
+        self.conv1_1 = nn.Conv2d(256, 256, (1, 1))
         self.conv2 = nn.Conv2d(1, 256, (3, 768), padding=(1,1))
-        self.conv3 = nn.Conv2d(256, 256, (5, 768), padding=(2, 2))
+        self.conv3 = nn.Conv2d(256, 256, (5, 1), padding=(2, 2))
         self.relu = nn.ReLU()
         self.bn = nn.BatchNorm2d(256)
         self.fc = nn.Linear(config.num_filters * 4, config.num_classes)
