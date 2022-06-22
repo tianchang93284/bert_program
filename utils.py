@@ -5,6 +5,7 @@ from tqdm import tqdm
 import time
 from datetime import timedelta
 from sklearn.preprocessing import MultiLabelBinarizer
+import matplotlib as plt
 
 PAD, CLS = '[PAD]', '[CLS]'  # padding符号, bert中综合信息符号
 
